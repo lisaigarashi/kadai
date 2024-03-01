@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>猫の散歩</title>
+    <script src="js/jquery-2.1.3.min.js"></script>
+    <link rel="stylesheet" href="css/sample.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>猫の散歩</h1>
+    </header>
+
+    <main style="display:none">
+        <!-- 初期画面はすべて非表示になる -->
+        <button id="dice">サイコロを振る</button>
+        <!-- <p id="result">サイコロの目</p> -->
+        <div class="container">
+            <div class="font">開始<span id="squre0" class="square">🐈</span></div>
+            <div class="box">1<span id="square1" class="square"></span></div>
+            <div class="box">2<span id="square2" class="square"></span></div>
+            <div class="box">3<span id="square3" class="square"></span></div>
+            <div class="box">4<span id="square4" class="square"></span></div>
+            <div class="box">5<span id="square5" class="square"></span></div>
+            <div class="box">6<span id="square6" class="square"></span></div>
+            <div class="box">7<span id="square7" class="square"></span></div>
+            <div class="box">8<span id="square8" class="square"></span></div>
+            <div class="box">9<span id="square9" class="square"></span></div>
+            <div class="font">終了<span id="square10" class="square"></span></div>
+        </div>
+
+
+        <p>サイコロの目</p>
+        <textarea id="text_area"></textarea>
+        <div class="dice_number">
+            <div>サイコロ目を記録</div>
+            <p></p>
+            <div id="record"></div>
+        </div>
+
+        <!-- <ul> -->
+            <!-- <li id="save">Save</li>  -->
+            <!-- <li id="clear">結果をClearする</li> -->
+            <button id="clear">結果をClearする</button>
+        <!-- </ul> -->
+    </main>
+    <footer>copy right 2024 cat walk</footer>
+
+    <!-- <footer><small>G's</small></footer> -->
+    <script>
+
+        // マスが5個 -->
+        // サイコロを振って出た目の数ほど進む
+        // 自分がいるマスのサイコロの変数を作る、最初はゼロ
+        // 出したサイコロの目は配列に入れ、配列に入れた数を加算していくための変数と用意する
+        let square = 0;
+        let totalresult = [];
+        let sum = 0;
+        // サイコロを振るボタンをクリックしたら以下の処理行う
+        $("#dice").on("click", function () {
+            // 1～6の数をランダムに作って変数に入れる
+            // 0はカウントしないので、最後に+1を必ず入れる
+            const dice = Math.floor(Math.random() * 6) + 1;
+            // 画面にサイコロの目を表示させる
+
+            //  サイコロの目をhtml上に出す
+            $("#result").text(dice);
+            console.log(dice);
+
+
+            // 表示させたサイコロの目をtextarに表示させlocalstorageとtextareに保存させる
+            const v = $("#text_area").val(dice);
+            localStorage.setItem("number", dice);
+            // 出したサイコロの目を配列として持ち続け、それを加算する
+            totalresult.push(dice);
+            // sumの初期値を設定
+            sum = 0;
+            //for文でサイコロの目が出たら、配列に入った数字を加算させていく
+            for (const value of totalresult) {
+                sum += value;
+
+            }
+            // 加算された数字をtextとしてhtml上に表示する
+            $("#record").text(sum);
+            //     if(localStorage.getItem("number")){
+            //     const v=localStorage.getItem("number");
+            //     $("#record").val(dice);
+            //  }else{
+            //     const v=localStorage.removeItem("number",dice);
+            //     $("#text_area").val("");
+            //  }
+            alert("save!");
+
+            // 変数の目だけ自分のいるマスの数を増やす
+            square += dice;
+            // マスの数が10を超えたらゴール
+            if (square === 10) {
+                // 全マスのアイコンを削除
+                $('.square').text('');
+                // 進んだ先のマスの部分に自分のアイコンを表示する
+                $("#square" + square).append('🐈');
+                // ゴールだったらアラートを出す
+                alert('ゴール');
+                square = 0;
+                $('.square' + square).text('🐈');
+            } else if (square > 10) {
+                // マスのカウントが10超えたら超えた分だけ戻る
+                square = 10 - (square - 10);
+                // 全コマのアイコンを削除する
+                $('.square').text('');
+                // 進んだ先のマスの部分に自分のアイコンを表示する
+                $('#square' + square).text('🐈')
+            } else {
+                // 全コマのアイコンを削除する
+                $('.square').text('');
+                // 進んだ先のマスの部分に自分のアイコンを表示させる
+                $('#square' + square).text('🐈');
+            }
+
+
+
+        });
+
+
+        // ゴールのマスを通り越したらゴール -->
+
+
+        $("main").slideDown(500);
+        // 上から下に表示される
+        //1.Save クリックイベント
+        //    $("#save").on("click",function(){
+        //     const v=$("#text_area").val();
+        //     localStorage.setItem("memo",v);
+        //     // localstaorageにtexareaにvalueを取る意味   
+
+        //     alert("保存しました");
+        //    });
+
+
+        //2.clear クリックイベント
+        $("#clear").on("click", function () {
+            localStorage.removeItem("memo");
+            alert("削除しました");
+            location.reload();
+            // $("#text_area").val("");
+            // $("#result").text("サイコロの目");
+            // $("#record").text("");
+            // // text areaのvalueを取得するという意味
+            // 確認の仕方はブラウザ→検証→
+        });
+
+
+        //3.ページ読み込み：保存データ取得表示
+        //   もしlocalstorageにmemoが入っていれば
+        // const vにmemoを入れ、text areaにvalueを渡す
+        // それによってtextareaに入っている文字がそのまま保存される
+        //  if(localStorage.getItem("memo")){
+        //     const v=localStorage.getItem("memo");
+        //     $("#text_area").val(v);
+        //  }
+        //  }else{
+        //     const v=localstorage.removeItem("memo");
+        //     $("#text_area").val("");
+        //  }
+
+
+
+        //ロード時に表示
+        //※こんなこともできる例
+    </script>
+</body>
+
+</html>
